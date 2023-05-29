@@ -3,7 +3,7 @@
 const net = require('node:net');
 const cp = require('node:child_process');
 const os = require('node:os');
-const Queue = require('./Queue');
+const Queue = require('../lib/Queue');
 
 const socket = new net.Socket();
 const cpuCount = os.cpus().length;
