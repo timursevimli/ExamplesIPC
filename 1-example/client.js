@@ -15,7 +15,7 @@ for (let i = 0; i < cpuCount; i++) {
   workers.push(worker);
 }
 
-const results = new Map();
+const results = [];
 
 const processTasks = ({ tasks, order = false }) =>
   new Promise((resolve, reject) => {
@@ -53,19 +53,12 @@ const processTasks = ({ tasks, order = false }) =>
           return;
         }
         const { result, i } = res;
-        results.set(i, result);
+        if (order) results[i] = result;
+        else results.push(result);
       })
       .drain(() => {
         console.log('Drain:', results);
-        let res = null;
-        if (order) {
-          res = Array.from(results)
-            .sort((a, b) => a[0] - b[0])
-            .flatMap(([, v]) => v);
-        } else {
-          res = Array.from(results.values()).flat();
-        }
-        resolve(res);
+        resolve(results.flat());
       });
 
     for (let i = 0; i < tasksCount; i++) {
