@@ -19,20 +19,19 @@ const results = [];
 
 const processTasks = ({ tasks, order = false }) =>
   new Promise((resolve, reject) => {
-    const tasksCount = tasks.length;
-    const workersCount = workers.length;
+    const wCount = workers.length;
 
     const queue = Queue.channels(8)
-      .process((task, cb) => {
+      .process((data, cb) => {
         const { concurrency } = queue;
-        if (concurrency > workersCount) {
+        if (concurrency > wCount) {
           const err = 'Dont use more than channels from workers count!';
           reject(err);
           return;
         }
         const worker = workers.shift();
-        const { data, i } = task;
-        worker.send(data);
+        const { task, i } = data;
+        worker.send(task);
 
         worker.once('exit', (code) => {
           console.log('Worker exited:', worker.pid, code);
@@ -61,9 +60,8 @@ const processTasks = ({ tasks, order = false }) =>
         resolve(results.flat());
       });
 
-    for (let i = 0; i < tasksCount; i++) {
-      const data = tasks[i];
-      queue.add({ data, i });
+    for (const [i, task] of Object.entries(tasks)) {
+      queue.add({ task, i });
     }
   });
 
