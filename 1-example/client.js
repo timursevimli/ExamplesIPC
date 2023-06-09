@@ -30,16 +30,17 @@ const processTasks = ({ tasks, order = false }) =>
           return;
         }
         const worker = workers.shift();
+        worker.removeAllListeners();
         const { task, i } = data;
         worker.send(task);
 
-        worker.once('exit', (code) => {
+        worker.on('exit', (code) => {
           console.log('Worker exited:', worker.pid, code);
         });
 
-        worker.once('error', cb);
+        worker.on('error', cb);
 
-        worker.once('message', (message) => {
+        worker.on('message', (message) => {
           console.log('Message from worker', worker.pid);
           workers.push(worker);
           const { result } = message;
@@ -56,7 +57,7 @@ const processTasks = ({ tasks, order = false }) =>
         else results.push(result);
       })
       .drain(() => {
-        console.log('Drain:', results);
+        console.log('All finished!', { results });
         resolve(results.flat());
       });
 
