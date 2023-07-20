@@ -22,7 +22,7 @@ const taskHandler = (data, callback) => {
   const task = JSON.parse(data);
   if (task.cmd) {
     if (task.cmd === 'finish') {
-      setTimeout(process.exit, 0, 100);
+      setTimeout(process.exit, 100, 0);
     }
     if (task.cmd === 'result') {
       callback(JSON.stringify(results));
